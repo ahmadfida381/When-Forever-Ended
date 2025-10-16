@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>When Forever Ended</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Georgia', serif;
+            background: linear-gradient(135deg, #1c1c1c 0%, #2d2d2d 25%, #3a3a3a 50%, #2d2d2d 75%, #1c1c1c 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #b8b8b8;
+            position: relative;
+            overflow-x: hidden;
+            padding: 40px 0;
+            transition: background 0.5s ease, color 0.5s ease;
+        }
+
+        body.theme-blue {
+            background: linear-gradient(135deg, #0d1b2a 0%, #1b263b 25%, #2d3e50 50%, #1b263b 75%, #0d1b2a 100%);
+            color: #b8c9d8;
+        }
+
+        body.theme-red {
+            background: linear-gradient(135deg, #1a0a0a 0%, #2d1515 25%, #3d1f1f 50%, #2d1515 75%, #1a0a0a 100%);
+            color: #d8b8b8;
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                radial-gradient(circle at 20% 30%, rgba(80, 80, 80, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(60, 60, 60, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+            animation: cloudMove 20s ease-in-out infinite;
+        }
+
+        @keyframes cloudMove {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.5; }
+        }
+
+        .rain {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .drop {
+            position: absolute;
+            width: 1px;
+            height: 30px;
+            background: linear-gradient(rgba(150, 150, 150, 0.4), transparent);
+            animation: fall linear infinite;
+            opacity: 0.6;
+        }
+
+        @keyframes fall {
+            to {
+                transform: translateY(100vh);
+            }
+        }
+
+        .lightning {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            background: rgba(255, 255, 255, 0);
+            animation: lightningFlash 8s ease-in-out infinite;
+        }
+
+        @keyframes lightningFlash {
+            0%, 100% { background: rgba(255, 255, 255, 0); }
+            45%, 46.5% { background: rgba(255, 255, 255, 0); }
+            46% { background: rgba(200, 200, 200, 0.15); }
+            46.2% { background: rgba(255, 255, 255, 0); }
+            46.4% { background: rgba(200, 200, 200, 0.2); }
+        }
+
+        .fog {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(ellipse at 30% 50%, rgba(100, 100, 100, 0.15) 0%, transparent 70%),
+                radial-gradient(ellipse at 70% 30%, rgba(120, 120, 120, 0.1) 0%, transparent 70%);
+            pointer-events: none;
+            animation: fogMove 15s ease-in-out infinite;
+        }
+
+        @keyframes fogMove {
+            0%, 100% { transform: translateX(0) translateY(0); opacity: 0.4; }
+            50% { transform: translateX(20px) translateY(-10px); opacity: 0.6; }
+        }
+
+        .container {
+            text-align: center;
+            padding: 60px 40px;
+            background: rgba(30, 30, 30, 0.85);
+            backdrop-filter: blur(25px);
+            border-radius: 25px;
+            box-shadow: 0 15px 60px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+            max-width: 950px;
+            width: 90%;
+            border: 1px solid rgba(100, 100, 100, 0.2);
+            position: relative;
+            z-index: 1;
+            animation: containerFade 3s ease-in;
+            transition: background 0.5s ease, border-color 0.5s ease;
+        }
+
+        body.theme-blue .container {
+            background: rgba(20, 30, 40, 0.85);
+            border-color: rgba(100, 120, 140, 0.25);
+        }
+
+        body.theme-red .container {
+            background: rgba(35, 20, 20, 0.85);
+            border-color: rgba(140, 100, 100, 0.25);
+        }
+
+        .theme-switcher {
+            position: fixed;
+            top: 30px;
+            right: 30px;
+            z-index: 1000;
+            display: flex;
+            gap: 15px;
+            background: rgba(30, 30, 30, 0.7);
+            padding: 12px 18px;
+            border-radius: 50px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(100, 100, 100, 0.2);
+        }
+
+        .theme-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .theme-btn:hover {
+            transform: scale(1.1);
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+
+        .theme-btn.active {
+            border-color: rgba(255, 255, 255, 0.8);
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+        }
+
+        .theme-btn.grey {
+            background: linear-gradient(135deg, #3a3a3a, #1c1c1c);
+        }
+
+        .theme-btn.blue {
+            background: linear-gradient(135deg, #2d3e50, #0d1b2a);
+        }
+
+        .theme-btn.red {
+            background: linear-gradient(135deg, #3d1f1f, #1a0a0a);
+        }
+
+        .birthday-box {
+            position: fixed;
+            right: 30px;
+            bottom: 30px;
+            background: rgba(40, 30, 50, 0.8);
+            backdrop-filter: blur(15px);
+            padding: 25px 20px;
+            border-radius: 20px;
+            border: 2px solid rgba(140, 120, 160, 0.3);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
+            text-align: center;
+            min-width: 180px;
+            z-index: 999;
+            transition: all 0.5s ease;
+        }
+
+        body.theme-blue .birthday-box {
+            background: rgba(30, 40, 55, 0.8);
+            border-color: rgba(100, 140, 180, 0.3);
+        }
+
+        body.theme-red .birthday-box {
+            background: rgba(50, 30, 35, 0.8);
+            border-color: rgba(180, 100, 120, 0.3);
+        }
+
+        .birthday-icon {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .birthday-label {
+            font-size: 0.8em;
+            color: #9a8aa8;
+            margin-bottom: 8px;
+            letter-spacing: 0.5px;
+            text-transform: none;
+            opacity: 0.8;
+            line-height: 1.4;
+        }
+
+        body.theme-blue .birthday-label {
+            color: #8a9fb5;
+        }
+
+        body.theme-red .birthday-label {
+            color: #b58a9f;
+        }
+
+        .birthday-date {
+            font-size: 1.3em;
+            color: #d4c4e2;
+            font-weight: bold;
+            margin-bottom: 12px;
+            text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.5);
+        }
+
+        body.theme-blue .birthday-date {
+            color: #c4d4e2;
+        }
+
+        body.theme-red .birthday-date {
+            color: #e2c4d4;
+        }
+
+        .birthday-countdown {
+            font-size: 0.9em;
+            color: #b0a0be;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid rgba(140, 120, 160, 0.2);
+        }
+
+        body.theme-blue .birthday-countdown {
+            color: #a0b0be;
+            border-top-color: rgba(100, 140, 180, 0.2);
+        }
+
+        body.theme-red .birthday-countdown {
+            color: #bea0b0;
+            border-top-color: rgba(180, 100, 120, 0.2);
+        }
+
+        .countdown-number {
+            font-size: 1.5em;
+            font-weight: bold;
+            display: block;
+            margin: 8px 0 5px 0;
+            font-family: 'Courier New', monospace;
+            color: #c4b4d2;
+        }
+
+        body.theme-blue .countdown-number {
+            color: #b4c4d2;
+        }
+
+        body.theme-red .countdown-number {
+            color: #d2b4c4;
+        }
+
+        @media (max-width: 1200px) {
+            .birthday-box {
+                right: 20px;
+                bottom: 20px;
+                min-width: 160px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .birthday-box {
+                right: 15px;
+                bottom: 15px;
+                min-width: 150px;
+                padding: 20px 15px;
+            }
+
+            .birthday-icon {
+                font-size: 2em;
+            }
+
+            .birthday-date {
+                font-size: 1.1em;
+            }
+
+            .countdown-number {
+                font-size: 1.3em;
+            }
+        }
+
+        @keyframes containerFade {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h1 {
+            font-size: 3em;
+            margin-bottom: 20px;
+            color: #9a9a9a;
+            font-weight: 400;
+            letter-spacing: 3px;
+            text-shadow: 3px 3px 15px rgba(0, 0, 0, 0.9);
+            font-style: italic;
+            animation: titlePulse 4s ease-in-out infinite;
+        }
+
+        @keyframes titlePulse {
+            0%, 100% { opacity: 0.9; }
+            50% { opacity: 0.7; }
+        }
+
+        .broken-heart {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            opacity: 0.5;
+            animation: heartbreak 3s ease-in-out infinite;
+            filter: grayscale(100%);
+        }
+
+        @keyframes heartbreak {
+            0%, 100% { transform: scale(1) rotate(0deg); }
+            25% { transform: scale(1.05) rotate(-2deg); }
+            75% { transform: scale(0.98) rotate(2deg); }
+        }
+
+        .start-date {
+            font-size: 1.15em;
+            margin-bottom: 50px;
+            opacity: 0.5;
+            color: #8a8a8a;
+            font-style: italic;
+        }
+
+        .time-display {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 25px;
+            margin-top: 40px;
+        }
+
+        .time-unit {
+            background: rgba(40, 40, 40, 0.7);
+            padding: 35px 20px;
+            border-radius: 18px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(100, 100, 100, 0.25);
+            transition: all 0.4s ease;
+            box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .time-unit:hover {
+            background: rgba(50, 50, 50, 0.8);
+            border-color: rgba(120, 120, 120, 0.4);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), inset 0 2px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .time-value {
+            font-size: 2.8em;
+            font-weight: 300;
+            display: block;
+            color: #a8a8a8;
+            text-shadow: 2px 2px 15px rgba(0, 0, 0, 0.9);
+            font-family: 'Courier New', monospace;
+            animation: numberFlicker 5s ease-in-out infinite;
+            word-break: break-all;
+            line-height: 1.1;
+        }
+
+        @keyframes numberFlicker {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.85; }
+        }
+
+        .time-label {
+            font-size: 0.95em;
+            margin-top: 15px;
+            opacity: 0.55;
+            text-transform: lowercase;
+            letter-spacing: 3px;
+            color: #7a7a7a;
+        }
+
+        .quote-of-day {
+            margin-top: 60px;
+            padding: 30px;
+            background: rgba(35, 35, 35, 0.7);
+            border-radius: 15px;
+            border: 2px solid rgba(100, 100, 100, 0.3);
+            box-shadow: inset 0 2px 15px rgba(0, 0, 0, 0.6);
+            animation: quoteFadeIn 2s ease-in;
+        }
+
+        @keyframes quoteFadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .quote-main {
+            font-size: 1.35em;
+            font-style: italic;
+            color: #c0c0c0;
+            line-height: 1.8;
+            font-weight: bold;
+            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8);
+        }
+
+        .quote-day-label {
+            font-size: 0.9em;
+            color: #787878;
+            margin-top: 15px;
+            opacity: 0.7;
+        }
+
+        .previous-quotes-toggle {
+            margin-top: 40px;
+            padding: 15px 30px;
+            background: rgba(35, 35, 35, 0.6);
+            border: 1px solid rgba(100, 100, 100, 0.3);
+            border-radius: 10px;
+            color: #a0a0a0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1em;
+            font-family: 'Georgia', serif;
+        }
+
+        .previous-quotes-toggle:hover {
+            background: rgba(45, 45, 45, 0.7);
+            border-color: rgba(120, 120, 120, 0.5);
+            color: #b8b8b8;
+        }
+
+        .arrow {
+            display: inline-block;
+            margin-left: 10px;
+            transition: transform 0.3s ease;
+        }
+
+        .arrow.expanded {
+            transform: rotate(180deg);
+        }
+
+        .quotes-section {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease;
+            margin-top: 20px;
+        }
+
+        .quotes-section.expanded {
+            max-height: 500px;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+
+        .quotes-section::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .quotes-section::-webkit-scrollbar-track {
+            background: rgba(30, 30, 30, 0.5);
+            border-radius: 10px;
+        }
+
+        .quotes-section::-webkit-scrollbar-thumb {
+            background: rgba(100, 100, 100, 0.4);
+            border-radius: 10px;
+        }
+
+        .quotes-section::-webkit-scrollbar-thumb:hover {
+            background: rgba(120, 120, 120, 0.6);
+        }
+
+        .quote-item {
+            margin-bottom: 25px;
+            padding: 20px;
+            background: rgba(35, 35, 35, 0.6);
+            border-radius: 12px;
+            border-left: 3px solid rgba(100, 100, 100, 0.4);
+            animation: fadeIn 0.5s ease-in;
+            box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(15px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .quote-text {
+            font-size: 1.05em;
+            font-style: italic;
+            color: #a8a8a8;
+            line-height: 1.7;
+            margin-bottom: 10px;
+        }
+
+        .quote-day {
+            font-size: 0.85em;
+            color: #787878;
+            opacity: 0.7;
+            text-align: right;
+        }
+
+        .tear {
+            position: absolute;
+            width: 3px;
+            height: 15px;
+            background: linear-gradient(rgba(180, 180, 180, 0.3), transparent);
+            border-radius: 50%;
+            animation: tearFall linear infinite;
+            pointer-events: none;
+        }
+
+        @keyframes tearFall {
+            to {
+                transform: translateY(100vh);
+                opacity: 0;
+            }
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.2em;
+            }
+
+            .broken-heart {
+                font-size: 2em;
+            }
+
+            .time-value {
+                font-size: 2.8em;
+            }
+
+            .time-unit {
+                padding: 28px 18px;
+            }
+
+            .container {
+                padding: 45px 28px;
+            }
+
+            .quote-main {
+                font-size: 1.15em;
+            }
+
+            .quotes-section.expanded {
+                max-height: 350px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="birthday-box">
+        <div class="birthday-icon">🎂</div>
+        <div class="birthday-label">A Day I'm Learning to Let Go</div>
+        <div class="birthday-date">October 9th</div>
+        <div class="birthday-countdown">
+            <span id="countdownLabel">Days until:</span>
+            <span class="countdown-number" id="birthdayCountdown">0</span>
+            <span id="countdownUnit">days</span>
+        </div>
+    </div>
+
+    <div class="theme-switcher">
+        <button class="theme-btn grey active" onclick="changeTheme('grey')" title="Stormy Grey"></button>
+        <button class="theme-btn blue" onclick="changeTheme('blue')" title="Deep Ocean"></button>
+        <button class="theme-btn red" onclick="changeTheme('red')" title="Broken Heart"></button>
+    </div>
+
+    <div class="lightning"></div>
+    <div class="fog"></div>
+    <div class="rain" id="rain"></div>
+    
+    <div class="container">
+        <div class="broken-heart">💔</div>
+        <h1>When Forever Ended</h1>
+        <div class="start-date">September 6th, 2025</div>
+        
+        <div class="time-display">
+            <div class="time-unit">
+                <span class="time-value" id="months">0</span>
+                <span class="time-label">months</span>
+            </div>
+            <div class="time-unit">
+                <span class="time-value" id="days">0</span>
+                <span class="time-label">days</span>
+            </div>
+            <div class="time-unit">
+                <span class="time-value" id="hours">0</span>
+                <span class="time-label">hours</span>
+            </div>
+            <div class="time-unit">
+                <span class="time-value" id="minutes">0</span>
+                <span class="time-label">minutes</span>
+            </div>
+            <div class="time-unit">
+                <span class="time-value" id="seconds">0</span>
+                <span class="time-label">seconds</span>
+            </div>
+        </div>
+
+        <div class="quote-of-day">
+            <div class="quote-main" id="mainQuote"></div>
+            <div class="quote-day-label" id="mainQuoteDay"></div>
+        </div>
+
+        <button class="previous-quotes-toggle" id="toggleBtn" onclick="toggleQuotes()">
+            View Previous Quotes <span class="arrow" id="arrow">▼</span>
+        </button>
+
+        <div class="quotes-section" id="quotesSection"></div>
+    </div>
+
+    <script>
+        // Create heavy rain effect
+        const rainContainer = document.getElementById('rain');
+        for (let i = 0; i < 100; i++) {
+            const drop = document.createElement('div');
+            drop.className = 'drop';
+            drop.style.left = Math.random() * 100 + '%';
+            drop.style.animationDuration = (Math.random() * 1.5 + 0.8) + 's';
+            drop.style.animationDelay = Math.random() * 2 + 's';
+            drop.style.opacity = Math.random() * 0.4 + 0.3;
+            rainContainer.appendChild(drop);
+        }
+
+        // Add occasional tears
+        setInterval(() => {
+            if (Math.random() > 0.7) {
+                const tear = document.createElement('div');
+                tear.className = 'tear';
+                tear.style.left = Math.random() * 100 + '%';
+                tear.style.animationDuration = (Math.random() + 2) + 's';
+                document.body.appendChild(tear);
+                
+                setTimeout(() => tear.remove(), 3000);
+            }
+        }, 2000);
+
+        const startDate = new Date('2025-09-06T00:00:00');
+
+        const quotes = [
+            "Time doesn't heal, it just teaches us to live with the pain 😔",
+            "I'm still waiting for the day when it doesn't hurt to think of you 💭",
+            "Some chapters end, but the story never stops echoing 📖",
+            "The hardest part isn't letting go, it's learning to start over 🌧️",
+            "You're gone, but the memories refuse to leave 🥀",
+            "I thought time would make it easier, but it just made it different ⏳",
+            "Every sunrise reminds me that you chose a different dawn 🌅",
+            "I'm counting days, but they all feel the same without you 📅",
+            "The silence is louder than any goodbye you never said 🤐",
+            "I lost you, but I'm still finding pieces of us everywhere 🧩",
+            "Some people leave, but they never really go away 👤",
+            "I'm learning that moving on doesn't mean forgetting 🚶",
+            "The heart remembers what the mind tries to forget 💭",
+            "You moved on, and I'm still here replaying what we were 🔄",
+            "Time passes, but this emptiness remains constant ⌛",
+            "I wish I could unlove you as easily as you left 💔",
+            "Every day is a reminder that I wasn't enough to make you stay 😞",
+            "I'm not broken, just permanently changed by your absence 🌑",
+            "The hardest prison to escape is the one we build from memories 🔒",
+            "You found your happiness, and I'm still searching for mine 🔍",
+            "I wonder if you count the days too, or if I'm the only one 🤔",
+            "Some goodbyes don't deserve the closure they never gave 🚪",
+            "I'm still here, holding onto what you let slip away 🌊",
+            "The saddest part is that life goes on, even when you don't want it to 🎭",
+            "I thought we were forever, but you had a different definition ∞",
+            "Missing you is my routine now, a habit I can't break 🔁",
+            "You moved mountains to leave, and I'm still climbing to forget ⛰️",
+            "I keep waiting for it to get easier, but easier never comes 😢",
+            "Love left, but the longing decided to stay 💌",
+            "I'm not waiting for you anymore, just waiting to stop wanting to 🕰️",
+            "Every song reminds me of a moment I can't return to 🎵",
+            "I gave you my heart, you gave me a lesson 📝",
+            "The worst distance is when you're right here but not really here 👻",
+            "I'm healing in the same place where you broke me 🩹",
+            "You left footprints on my heart that I can't wash away 👣",
+            "I don't miss you, I miss who I thought you were 🎭",
+            "It's strange how the people who hurt us remain the hardest to forget 🌪️",
+            "I'm learning to be okay with never getting an explanation 🤷",
+            "Your absence is the presence that haunts me 🕯️",
+            "I built a home in your heart, now I'm homeless 🏚️",
+            "The hardest goodbyes are the ones never said out loud 🤫",
+            "I keep replaying our ending hoping for a different result 🎬",
+            "You were my favorite hello and my hardest goodbye 👋",
+            "I'm still writing you letters I'll never send 💌",
+            "The pain is less sharp now, just more constant 📉",
+            "I thought I was your home, turns out I was just a rest stop 🛑",
+            "Missing you comes in waves, and tonight I'm drowning 🌊",
+            "I'm too tired to fight for someone who already surrendered 🏳️",
+            "You taught me that forever can have an expiration date ⌛",
+            "I'm learning to be strangers with someone I once knew better than myself 👥",
+            "The saddest part is I would still choose you, but you wouldn't choose me 💔",
+            "I'm not crying over you, I'm crying over the time I wasted 😭",
+            "You were a beautiful mistake I'd make all over again 🎨",
+            "I loved you at your worst, you left me at my best 📊",
+            "Every empty space in my life has your shape 🕳️",
+            "I'm picking up pieces of a person I used to be 🧩",
+            "You took pieces of me with you that I can't get back 🎁",
+            "I'm unlearning the habit of loving you 📖",
+            "The hardest part about moving forward is not looking back 👀",
+            "I survived losing you, but I'm still learning to live without you 💪",
+            "Your memory is a ghost I can't exorcise 👻",
+            "I'm slowly becoming okay with never being okay about this 🌱",
+            "You left, but the 'what ifs' stayed 🤔",
+            "I wish I could hate you, it would hurt less than missing you 😔",
+            "Every version of me loved a different version of you 🎭",
+            "I'm learning that closure is something I give myself 🔐",
+            "The hardest person to get over is the one who never really tried 🚶",
+            "I'm tired of pretending I'm over something I'm still under 😩",
+            "You were my favorite chapter, but not my whole story 📚",
+            "I don't hate you, I'm just disappointed you turned out to be like everyone else 😕",
+            "Missing you is a choice I keep making 🎯",
+            "I'm mourning the future we'll never have 🌅",
+            "You showed me love, then taught me loneliness 🎓",
+            "I'm collecting scars where you used to leave kisses 💋",
+            "The hardest truth is that you were never really mine to lose 💭",
+            "I'm learning to love the person you couldn't 💪",
+            "Every day without you is proof that I'm stronger than I thought 🦾",
+            "You left me with nothing but everything to think about 🤯",
+            "I'm not broken, just bent from carrying what was meant for two 🏋️",
+            "The saddest songs now sound like our biography 🎶"
+        ];
+
+        function changeTheme(theme) {
+            const body = document.body;
+            const buttons = document.querySelectorAll('.theme-btn');
+            
+            // Remove all theme classes
+            body.classList.remove('theme-blue', 'theme-red');
+            
+            // Add new theme class
+            if (theme === 'blue') {
+                body.classList.add('theme-blue');
+            } else if (theme === 'red') {
+                body.classList.add('theme-red');
+            }
+            
+            // Update active button
+            buttons.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Save theme preference
+            localStorage.setItem('theme', theme);
+        }
+
+        // Load saved theme on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme') || 'grey';
+            if (savedTheme !== 'grey') {
+                document.body.classList.add(`theme-${savedTheme}`);
+                document.querySelector(`.theme-btn.${savedTheme}`).classList.add('active');
+                document.querySelector('.theme-btn.grey').classList.remove('active');
+            }
+        });
+
+        function getDaysSinceStart() {
+            const now = new Date();
+            const diff = now - startDate;
+            return Math.floor(diff / (1000 * 60 * 60 * 24));
+        }
+
+        function displayMainQuote() {
+            const daysPassed = getDaysSinceStart();
+            const quoteIndex = Math.max(0, Math.min(daysPassed, quotes.length - 1));
+            
+            document.getElementById('mainQuote').textContent = `"${quotes[quoteIndex]}"`;
+            document.getElementById('mainQuoteDay').textContent = daysPassed === 0 ? 'Day 0' : `Day ${daysPassed}`;
+        }
+
+        function displayPreviousQuotes() {
+            const quotesSection = document.getElementById('quotesSection');
+            quotesSection.innerHTML = '';
+            
+            const daysPassed = getDaysSinceStart();
+            
+            for (let day = daysPassed - 1; day >= 0; day--) {
+                if (day < quotes.length) {
+                    const quoteItem = document.createElement('div');
+                    quoteItem.className = 'quote-item';
+                    
+                    const quoteText = document.createElement('div');
+                    quoteText.className = 'quote-text';
+                    quoteText.textContent = `"${quotes[day]}"`;
+                    
+                    const quoteDay = document.createElement('div');
+                    quoteDay.className = 'quote-day';
+                    quoteDay.textContent = day === 0 ? 'Day 0' : `Day ${day}`;
+                    
+                    quoteItem.appendChild(quoteText);
+                    quoteItem.appendChild(quoteDay);
+                    quotesSection.appendChild(quoteItem);
+                }
+            }
+        }
+
+        function toggleQuotes() {
+            const quotesSection = document.getElementById('quotesSection');
+            const arrow = document.getElementById('arrow');
+            const toggleBtn = document.getElementById('toggleBtn');
+            
+            if (quotesSection.classList.contains('expanded')) {
+                quotesSection.classList.remove('expanded');
+                arrow.classList.remove('expanded');
+                toggleBtn.innerHTML = 'View Previous Quotes <span class="arrow" id="arrow">▼</span>';
+            } else {
+                quotesSection.classList.add('expanded');
+                arrow.classList.add('expanded');
+                toggleBtn.innerHTML = 'Hide Previous Quotes <span class="arrow expanded" id="arrow">▲</span>';
+                displayPreviousQuotes();
+            }
+        }
+
+        function updateTime() {
+            const now = new Date();
+            const diff = now - startDate;
+
+            const seconds = Math.floor(diff / 1000);
+            const minutes = Math.floor(seconds / 60);
+            const hours = Math.floor(minutes / 60);
+            const days = Math.floor(hours / 24);
+            
+            const years = now.getFullYear() - startDate.getFullYear();
+            const months = (years * 12) + (now.getMonth() - startDate.getMonth());
+
+            document.getElementById('months').textContent = months;
+            document.getElementById('days').textContent = days;
+            document.getElementById('hours').textContent = hours;
+            document.getElementById('minutes').textContent = minutes;
+            document.getElementById('seconds').textContent = seconds;
+        }
+
+        function updateBirthdayCountdown() {
+            const now = new Date();
+            const currentYear = now.getFullYear();
+            
+            // Set birthday for this year
+            let birthday = new Date(currentYear, 9, 9); // October 9th (month is 0-indexed)
+            
+            // If birthday has passed this year, set it for next year
+            if (now > birthday) {
+                birthday = new Date(currentYear + 1, 9, 9);
+            }
+            
+            const diff = birthday - now;
+            const daysUntil = Math.ceil(diff / (1000 * 60 * 60 * 24));
+            
+            const countdownElement = document.getElementById('birthdayCountdown');
+            const countdownLabel = document.getElementById('countdownLabel');
+            const countdownUnit = document.getElementById('countdownUnit');
+            
+            if (daysUntil === 0) {
+                countdownLabel.textContent = "Today! 🎉";
+                countdownElement.textContent = "🎈";
+                countdownUnit.textContent = "";
+            } else if (daysUntil === 1) {
+                countdownLabel.textContent = "Tomorrow:";
+                countdownElement.textContent = daysUntil;
+                countdownUnit.textContent = "day";
+            } else {
+                countdownLabel.textContent = "Days until:";
+                countdownElement.textContent = daysUntil;
+                countdownUnit.textContent = "days";
+            }
+        }
+
+        updateTime();
+        displayMainQuote();
+        updateBirthdayCountdown();
+        setInterval(updateTime, 1000);
+        setInterval(updateBirthdayCountdown, 60000); // Update birthday countdown every minute
+        
+        setInterval(() => {
+            const now = new Date();
+            if (now.getHours() === 0 && now.getMinutes() === 0 && now.getSeconds() === 0) {
+                displayMainQuote();
+                const quotesSection = document.getElementById('quotesSection');
+                if (quotesSection.classList.contains('expanded')) {
+                    displayPreviousQuotes();
+                }
+            }
+        }, 1000);
+    </script>
+</body>
+</html>
